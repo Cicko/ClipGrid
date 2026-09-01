@@ -6,11 +6,9 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
-### Release preparation
+### Changed
 
 - Added App Sandbox and privacy-manifest resources.
-- Added reproducible Mac App Store screenshot generation.
-- Added App Store metadata, review notes, privacy audit, pricing research, and release checklists.
 
 ## 1.0.0 - Unreleased
 
@@ -26,7 +24,6 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 - Local persistence across relaunches.
 - Automatic payload deduplication.
 - Exclusion of pasteboards marked concealed, transient, or auto-generated.
-- Privacy-safe in-memory demo mode for repository and App Store screenshots.
 
 ### Privacy
 
