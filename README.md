@@ -22,7 +22,7 @@ Clipboard history should be immediate, visually understandable, and private. Cli
 
 ### Colorful keyboard-addressable history
 
-![ClipGrid clipboard overview with application icons and colorful cards](docs/screenshots/01-overview.png)
+![ClipGrid clipboard overview with application icons and colorful cards](docs/screenshots/01-overview.jpg)
 
 ### Image clipboard previews
 
