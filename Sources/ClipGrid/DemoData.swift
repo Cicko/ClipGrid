@@ -11,6 +11,7 @@ enum DemoData {
                 text: "https://developer.apple.com/design/human-interface-guidelines/",
                 appName: "Safari",
                 bundleIdentifier: "com.apple.Safari",
+                isPinned: true,
                 secondsAgo: 18,
                 now: now
             ),
@@ -44,6 +45,7 @@ enum DemoData {
                 text: "Launch checklist\n• App Store screenshots\n• Privacy policy\n• Release notes",
                 appName: "Notes",
                 bundleIdentifier: "com.apple.Notes",
+                isPinned: true,
                 secondsAgo: 270,
                 now: now
             ),
@@ -99,6 +101,7 @@ enum DemoData {
         filePaths: [String] = [],
         appName: String,
         bundleIdentifier: String,
+        isPinned: Bool = false,
         secondsAgo: TimeInterval,
         now: Date
     ) -> ClipboardItem {
@@ -114,7 +117,8 @@ enum DemoData {
             ),
             sourceAppName: appName,
             sourceBundleIdentifier: bundleIdentifier,
-            sourceIconData: SourceApplication.iconData(forBundleIdentifier: bundleIdentifier)
+            sourceIconData: SourceApplication.iconData(forBundleIdentifier: bundleIdentifier),
+            isPinned: isPinned
         )
     }
 

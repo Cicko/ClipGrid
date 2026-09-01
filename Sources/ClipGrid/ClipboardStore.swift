@@ -19,7 +19,7 @@ final class ClipboardStore: ObservableObject {
         lastChangeCount = pasteboard.changeCount
         historyURL = Self.makeHistoryURL()
         if demoMode {
-            items = DemoData.makeItems()
+            items = Self.ordered(DemoData.makeItems())
             isPaused = true
         } else {
             load()
@@ -85,12 +85,25 @@ final class ClipboardStore: ObservableObject {
         }
     }
 
+    func togglePinnedOnly() {
+        filter.pinnedOnly.toggle()
+    }
+
     func resetFilter() {
         filter = ClipboardFilter()
     }
 
     func delete(_ item: ClipboardItem) {
         items.removeAll { $0.id == item.id }
+        normalizeFilter()
+        persist()
+    }
+
+    func togglePinned(_ item: ClipboardItem) {
+        guard let index = items.firstIndex(where: { $0.id == item.id }) else { return }
+        var updated = items.remove(at: index)
+        updated.isPinned.toggle()
+        insertAtFrontOfSection(updated)
         normalizeFilter()
         persist()
     }
@@ -135,13 +148,18 @@ final class ClipboardStore: ObservableObject {
         guard currentChangeCount != lastChangeCount else { return }
         lastChangeCount = currentChangeCount
 
-        guard let item = makeClipboardItem() else { return }
+        guard var item = makeClipboardItem() else { return }
         if let existingIndex = items.firstIndex(where: { $0.fingerprint == item.fingerprint }) {
+            item.isPinned = items[existingIndex].isPinned
             items.remove(at: existingIndex)
         }
-        items.insert(item, at: 0)
-        if items.count > maximumItemCount {
-            items.removeLast(items.count - maximumItemCount)
+        insertAtFrontOfSection(item)
+        while items.count > maximumItemCount {
+            if let unpinnedIndex = items.lastIndex(where: { !$0.isPinned }) {
+                items.remove(at: unpinnedIndex)
+            } else {
+                items.removeLast()
+            }
         }
         persist()
     }
@@ -225,8 +243,17 @@ final class ClipboardStore: ObservableObject {
     private func moveToFront(_ item: ClipboardItem) {
         guard let index = items.firstIndex(where: { $0.id == item.id }), index != 0 else { return }
         let existing = items.remove(at: index)
-        items.insert(existing, at: 0)
+        insertAtFrontOfSection(existing)
         persist()
+    }
+
+    private func insertAtFrontOfSection(_ item: ClipboardItem) {
+        if item.isPinned {
+            items.insert(item, at: 0)
+        } else {
+            let firstUnpinnedIndex = items.firstIndex(where: { !$0.isPinned }) ?? items.endIndex
+            items.insert(item, at: firstUnpinnedIndex)
+        }
     }
 
     private func normalizeFilter() {
@@ -238,12 +265,15 @@ final class ClipboardStore: ObservableObject {
            !items.contains(where: { $0.fileExtensionKeys.contains(fileExtension) }) {
             filter.fileExtension = nil
         }
+        if filter.pinnedOnly, !items.contains(where: \.isPinned) {
+            filter.pinnedOnly = false
+        }
     }
 
     private func load() {
         guard let data = try? Data(contentsOf: historyURL),
               let decoded = try? JSONDecoder().decode([ClipboardItem].self, from: data) else { return }
-        items = Array(decoded.prefix(maximumItemCount))
+        items = Array(Self.ordered(decoded).prefix(maximumItemCount))
     }
 
     private func persist() {
@@ -264,5 +294,12 @@ final class ClipboardStore: ObservableObject {
         return applicationSupport
             .appendingPathComponent("ClipGrid", isDirectory: true)
             .appendingPathComponent("history.json")
+    }
+
+    private static func ordered(_ values: [ClipboardItem]) -> [ClipboardItem] {
+        values.sorted { first, second in
+            if first.isPinned != second.isPinned { return first.isPinned }
+            return first.copiedAt > second.copiedAt
+        }
     }
 }

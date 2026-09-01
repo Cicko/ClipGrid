@@ -42,6 +42,7 @@ Clipboard history should be immediate, visually understandable, and private. Cli
 - **App-aware color families** — browsers, Telegram, messaging, notes, developer tools, and other apps receive consistent visual treatment
 - **Instant filters** — narrow history by text, link, image, file, or originating application
 - **Dynamic file types** — when viewing files, filter by extensions such as PDF, PNG, ZIP, or folders without an extension
+- **Persistent pins** — keep important clips above normal history and view them with a dedicated Pinned filter
 - **URL presentation** — copied links show their host and complete URL
 - **Automatic deduplication** — repeated values move to the front
 - **Per-card deletion** — every card includes a trash control
@@ -60,6 +61,8 @@ Clipboard history should be immediate, visually understandable, and private. Cli
 | Press `1–9` or `A–Z` | Copy the assigned card back to the system clipboard |
 | Click a card | Copy that card |
 | Click its trash icon | Remove only that clip |
+| Click its pin icon | Pin or unpin the clip; pinned values stay at the top |
+| Choose the Pinned filter | Show only retained pinned values |
 | Choose a type or app filter | Reassign keys to only the visible matching cards |
 | Choose a file extension | Show copied files containing that type |
 | Press `Esc` | Close the panel |
@@ -157,8 +160,8 @@ Tests currently cover:
 
 - [ ] Sandboxed Xcode project and App Store archive workflow
 - [ ] Launch at login
-- [ ] Search and filtering
-- [ ] Pin important clips
+- [x] Filtering by content type, file extension, and source app
+- [x] Pin important clips
 - [ ] User-configurable history length
 - [ ] Optional automatic expiration
 - [ ] App exclusions

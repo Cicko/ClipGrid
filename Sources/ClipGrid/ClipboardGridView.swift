@@ -39,6 +39,7 @@ struct ClipboardGridView: View {
                                         item: item,
                                         shortcut: ShortcutMap.labels[index],
                                         onChoose: { onChoose(item) },
+                                        onPin: { store.togglePinned(item) },
                                         onDelete: { store.delete(item) }
                                     )
                                 }
@@ -131,6 +132,21 @@ struct ClipboardGridView: View {
                 }
                 .buttonStyle(.plain)
             }
+
+            Button {
+                store.togglePinnedOnly()
+            } label: {
+                Label("Pinned", systemImage: store.filter.pinnedOnly ? "pin.fill" : "pin")
+                    .font(.system(size: 9, weight: .bold, design: .rounded))
+                    .padding(.horizontal, 9)
+                    .padding(.vertical, 7)
+                    .foregroundStyle(store.filter.pinnedOnly ? .white : .secondary)
+                    .background(
+                        store.filter.pinnedOnly ? Color(hex: 0xFF6F91) : .black.opacity(0.045),
+                        in: Capsule()
+                    )
+            }
+            .buttonStyle(.plain)
 
             Divider().frame(height: 22).padding(.horizontal, 2)
 
@@ -321,6 +337,7 @@ private struct ClipboardCard: View {
     let item: ClipboardItem
     let shortcut: String
     let onChoose: () -> Void
+    let onPin: () -> Void
     let onDelete: () -> Void
 
     @State private var isHovering = false
@@ -347,7 +364,7 @@ private struct ClipboardCard: View {
                     sourceBadge
 
                     Spacer()
-                    Color.clear.frame(width: 25, height: 25)
+                    Color.clear.frame(width: 58, height: 25)
                 }
 
                 content
@@ -365,16 +382,28 @@ private struct ClipboardCard: View {
             }
             .padding(14)
 
-            Button(action: onDelete) {
-                Image(systemName: "trash")
-                    .font(.system(size: 10, weight: .bold))
-                    .foregroundStyle(palette.ink.opacity(0.6))
-                    .frame(width: 28, height: 28)
-                    .background(.white.opacity(isHovering ? 0.88 : 0.58), in: Circle())
+            HStack(spacing: 4) {
+                Button(action: onPin) {
+                    Image(systemName: item.isPinned ? "pin.fill" : "pin")
+                        .font(.system(size: 10, weight: .bold))
+                        .foregroundStyle(item.isPinned ? Color(hex: 0xD94F73) : palette.ink.opacity(0.6))
+                        .frame(width: 28, height: 28)
+                        .background(.white.opacity(isHovering || item.isPinned ? 0.9 : 0.58), in: Circle())
+                }
+                .buttonStyle(.plain)
+                .help(item.isPinned ? "Unpin this clip" : "Pin this clip")
+
+                Button(action: onDelete) {
+                    Image(systemName: "trash")
+                        .font(.system(size: 10, weight: .bold))
+                        .foregroundStyle(palette.ink.opacity(0.6))
+                        .frame(width: 28, height: 28)
+                        .background(.white.opacity(isHovering ? 0.88 : 0.58), in: Circle())
+                }
+                .buttonStyle(.plain)
+                .help("Delete this clip")
             }
-            .buttonStyle(.plain)
             .padding(11)
-            .help("Delete this clip")
         }
         .frame(height: 172)
         .scaleEffect(isHovering ? 1.018 : 1)

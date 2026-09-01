@@ -18,7 +18,8 @@ import Testing
         text: "same value",
         colorIndex: 8,
         sourceAppName: "Safari",
-        sourceBundleIdentifier: "com.apple.Safari"
+        sourceBundleIdentifier: "com.apple.Safari",
+        isPinned: true
     )
     let different = ClipboardItem(kind: .link, text: "same value", colorIndex: 0)
 
@@ -53,6 +54,7 @@ import Testing
     #expect(item.sourceAppName == nil)
     #expect(item.sourceBundleIdentifier == nil)
     #expect(item.sourceIconData == nil)
+    #expect(!item.isPinned)
 }
 
 @Test func filtersMatchKindSourceAndFileExtension() {
@@ -94,6 +96,7 @@ import Testing
     #expect(items.allSatisfy { $0.sourceAppName != nil })
     #expect(items.contains { $0.kind == .image })
     #expect(items.contains { $0.kind == .files && $0.fileExtensionKeys.contains("pdf") })
+    #expect(items.filter(\.isPinned).count == 2)
 
     let safariLinks = items.filter(
         ClipboardFilter(kind: .link, sourceKey: "com.apple.Safari").matches
@@ -108,4 +111,22 @@ import Testing
         ).matches
     )
     #expect(finderPDFs.count == 1)
+}
+
+@Test @MainActor func pinningReordersAndFiltersDemoHistory() throws {
+    let store = ClipboardStore(demoMode: true)
+    #expect(store.items.prefix(2).allSatisfy { $0.isPinned })
+
+    let itemToPin = try #require(store.items.last(where: { !$0.isPinned }))
+    store.togglePinned(itemToPin)
+    #expect(store.items.first?.id == itemToPin.id)
+    #expect(store.items.first?.isPinned == true)
+
+    store.togglePinnedOnly()
+    #expect(store.filteredItems.count == 3)
+    #expect(store.filteredItems.allSatisfy { $0.isPinned })
+
+    store.togglePinned(itemToPin)
+    #expect(store.filteredItems.count == 2)
+    #expect(store.items.firstIndex(where: { !$0.isPinned }) == 2)
 }

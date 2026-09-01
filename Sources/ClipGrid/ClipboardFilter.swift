@@ -67,13 +67,15 @@ struct ClipboardFilter: Equatable {
     var kind: ClipKindFilter = .all
     var sourceKey: String?
     var fileExtension: String?
+    var pinnedOnly = false
 
     var isActive: Bool {
-        kind != .all || sourceKey != nil || fileExtension != nil
+        kind != .all || sourceKey != nil || fileExtension != nil || pinnedOnly
     }
 
     func matches(_ item: ClipboardItem) -> Bool {
         guard kind.matches(item) else { return false }
+        if pinnedOnly, !item.isPinned { return false }
         if let sourceKey, item.sourceKey != sourceKey { return false }
         if let fileExtension, !item.fileExtensionKeys.contains(fileExtension) { return false }
         return true

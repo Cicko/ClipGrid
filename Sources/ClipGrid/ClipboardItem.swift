@@ -37,6 +37,7 @@ struct ClipboardItem: Identifiable, Codable, Equatable, Sendable {
     let sourceAppName: String?
     let sourceBundleIdentifier: String?
     let sourceIconData: Data?
+    var isPinned: Bool
 
     init(
         id: UUID = UUID(),
@@ -48,7 +49,8 @@ struct ClipboardItem: Identifiable, Codable, Equatable, Sendable {
         colorIndex: Int,
         sourceAppName: String? = nil,
         sourceBundleIdentifier: String? = nil,
-        sourceIconData: Data? = nil
+        sourceIconData: Data? = nil,
+        isPinned: Bool = false
     ) {
         self.id = id
         self.kind = kind
@@ -60,6 +62,7 @@ struct ClipboardItem: Identifiable, Codable, Equatable, Sendable {
         self.sourceAppName = sourceAppName
         self.sourceBundleIdentifier = sourceBundleIdentifier
         self.sourceIconData = sourceIconData
+        self.isPinned = isPinned
     }
 
     var fingerprint: String {
@@ -76,5 +79,40 @@ struct ClipboardItem: Identifiable, Codable, Equatable, Sendable {
         case .files: "\(filePaths.count) copied file\(filePaths.count == 1 ? "" : "s")"
         case .link, .text: text
         }
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case id, kind, text, imageData, filePaths, copiedAt, colorIndex
+        case sourceAppName, sourceBundleIdentifier, sourceIconData, isPinned
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(UUID.self, forKey: .id)
+        kind = try container.decode(Kind.self, forKey: .kind)
+        text = try container.decode(String.self, forKey: .text)
+        imageData = try container.decodeIfPresent(Data.self, forKey: .imageData)
+        filePaths = try container.decode([String].self, forKey: .filePaths)
+        copiedAt = try container.decode(Date.self, forKey: .copiedAt)
+        colorIndex = try container.decode(Int.self, forKey: .colorIndex)
+        sourceAppName = try container.decodeIfPresent(String.self, forKey: .sourceAppName)
+        sourceBundleIdentifier = try container.decodeIfPresent(String.self, forKey: .sourceBundleIdentifier)
+        sourceIconData = try container.decodeIfPresent(Data.self, forKey: .sourceIconData)
+        isPinned = try container.decodeIfPresent(Bool.self, forKey: .isPinned) ?? false
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(id, forKey: .id)
+        try container.encode(kind, forKey: .kind)
+        try container.encode(text, forKey: .text)
+        try container.encodeIfPresent(imageData, forKey: .imageData)
+        try container.encode(filePaths, forKey: .filePaths)
+        try container.encode(copiedAt, forKey: .copiedAt)
+        try container.encode(colorIndex, forKey: .colorIndex)
+        try container.encodeIfPresent(sourceAppName, forKey: .sourceAppName)
+        try container.encodeIfPresent(sourceBundleIdentifier, forKey: .sourceBundleIdentifier)
+        try container.encodeIfPresent(sourceIconData, forKey: .sourceIconData)
+        try container.encode(isPinned, forKey: .isPinned)
     }
 }
