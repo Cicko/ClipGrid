@@ -2,5 +2,7 @@
 dist/
 .DS_Store
 *.xcuserstate
+__pycache__/
+.venv-marketing/
 Support/AppIcon.iconset/
 Support/AppIcon-1024.png

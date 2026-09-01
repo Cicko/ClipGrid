@@ -10,7 +10,7 @@ ClipGrid processes clipboard values that macOS places on the system pasteboard w
 
 ## Storage
 
-Clipboard history is stored only on the user's Mac in the ClipGrid Application Support directory. ClipGrid does not operate a server and does not transmit clipboard history to the developer or any third party.
+Clipboard history is stored only on the user's Mac in ClipGrid's Application Support directory. A sandboxed Mac App Store build stores this directory inside ClipGrid's macOS app container. ClipGrid does not operate a server and does not transmit clipboard history to the developer or any third party.
 
 ## Data not collected
 
@@ -27,8 +27,8 @@ Pasteboards marked by their originating application as concealed, transient, or 
 
 ## User control
 
-Users can pause monitoring, delete individual clips, clear all history, or quit ClipGrid at any time. Uninstalling the application does not automatically delete its Application Support history; users can remove the `~/Library/Application Support/ClipGrid` directory manually.
+Users can pause monitoring, delete individual clips, clear all history, or quit ClipGrid at any time. Uninstalling the application does not automatically delete its Application Support history. The exact storage path depends on whether ClipGrid is installed as a sandboxed App Store build or built directly from source.
 
 ## Contact
 
-Privacy and support contact details will be published before the Mac App Store submission. Until then, use the GitHub repository's issue tracker without including private clipboard content.
+For privacy questions, use the [ClipGrid GitHub repository](https://github.com/Cicko/ClipGrid) without including private clipboard content. Security-sensitive reports should follow [`SECURITY.md`](https://github.com/Cicko/ClipGrid/blob/main/SECURITY.md) rather than a public issue.
