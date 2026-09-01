@@ -103,9 +103,9 @@ final class ClipboardPanelController: NSWindowController, NSWindowDelegate {
             guard event.modifierFlags.intersection([.command, .control, .option]).isEmpty,
                   let characters = event.charactersIgnoringModifiers,
                   let index = ShortcutMap.index(for: characters),
-                  index < self.store.items.count else { return event }
+                  index < self.store.filteredItems.count else { return event }
 
-            self.store.copy(self.store.items[index])
+            self.store.copy(self.store.filteredItems[index])
             self.hide()
             return nil
         }

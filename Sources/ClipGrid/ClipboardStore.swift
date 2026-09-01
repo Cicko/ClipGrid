@@ -5,6 +5,7 @@ import Foundation
 final class ClipboardStore: ObservableObject {
     @Published private(set) var items: [ClipboardItem] = []
     @Published private(set) var isPaused = false
+    @Published private(set) var filter = ClipboardFilter()
 
     private let pasteboard = NSPasteboard.general
     private let maximumItemCount = ShortcutMap.labels.count
@@ -23,13 +24,71 @@ final class ClipboardStore: ObservableObject {
         isPaused.toggle()
     }
 
+    var filteredItems: [ClipboardItem] {
+        items.filter(filter.matches)
+    }
+
+    var sourceFilterOptions: [SourceFilterOption] {
+        var options: [String: SourceFilterOption] = [:]
+        for item in items {
+            let key = item.sourceKey
+            guard options[key] == nil else { continue }
+            options[key] = SourceFilterOption(
+                id: key,
+                name: item.sourceAppName ?? "Unknown source",
+                iconData: item.sourceIconData
+            )
+        }
+        return options.values.sorted {
+            $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending
+        }
+    }
+
+    var fileExtensionFilterOptions: [FileExtensionFilterOption] {
+        let extensions = items
+            .filter { item in
+                item.kind == .files && (filter.sourceKey == nil || item.sourceKey == filter.sourceKey)
+            }
+            .reduce(into: Set<String>()) { result, item in
+                result.formUnion(item.fileExtensionKeys)
+            }
+        return extensions
+            .map(FileExtensionFilterOption.init(id:))
+            .sorted { $0.title.localizedCaseInsensitiveCompare($1.title) == .orderedAscending }
+    }
+
+    func selectKind(_ kind: ClipKindFilter) {
+        filter.kind = kind
+        if kind != .files {
+            filter.fileExtension = nil
+        }
+    }
+
+    func selectSource(_ sourceKey: String?) {
+        filter.sourceKey = sourceKey
+        normalizeFilter()
+    }
+
+    func selectFileExtension(_ fileExtension: String?) {
+        filter.fileExtension = fileExtension
+        if fileExtension != nil {
+            filter.kind = .files
+        }
+    }
+
+    func resetFilter() {
+        filter = ClipboardFilter()
+    }
+
     func delete(_ item: ClipboardItem) {
         items.removeAll { $0.id == item.id }
+        normalizeFilter()
         persist()
     }
 
     func clear() {
         items.removeAll()
+        resetFilter()
         persist()
     }
 
@@ -159,6 +218,17 @@ final class ClipboardStore: ObservableObject {
         let existing = items.remove(at: index)
         items.insert(existing, at: 0)
         persist()
+    }
+
+    private func normalizeFilter() {
+        if let sourceKey = filter.sourceKey,
+           !items.contains(where: { $0.sourceKey == sourceKey }) {
+            filter.sourceKey = nil
+        }
+        if let fileExtension = filter.fileExtension,
+           !items.contains(where: { $0.fileExtensionKeys.contains(fileExtension) }) {
+            filter.fileExtension = nil
+        }
     }
 
     private func load() {

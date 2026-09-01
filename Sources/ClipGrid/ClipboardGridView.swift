@@ -26,20 +26,27 @@ struct ClipboardGridView: View {
                 if store.items.isEmpty {
                     emptyState
                 } else {
-                    ScrollView {
-                        LazyVGrid(columns: columns, spacing: 14) {
-                            ForEach(Array(store.items.prefix(ShortcutMap.labels.count).enumerated()), id: \.element.id) { index, item in
-                                ClipboardCard(
-                                    item: item,
-                                    shortcut: ShortcutMap.labels[index],
-                                    onChoose: { onChoose(item) },
-                                    onDelete: { store.delete(item) }
-                                )
+                    filterBar
+                    Divider().opacity(0.4)
+
+                    if store.filteredItems.isEmpty {
+                        filteredEmptyState
+                    } else {
+                        ScrollView {
+                            LazyVGrid(columns: columns, spacing: 14) {
+                                ForEach(Array(store.filteredItems.enumerated()), id: \.element.id) { index, item in
+                                    ClipboardCard(
+                                        item: item,
+                                        shortcut: ShortcutMap.labels[index],
+                                        onChoose: { onChoose(item) },
+                                        onDelete: { store.delete(item) }
+                                    )
+                                }
                             }
+                            .padding(22)
                         }
-                        .padding(22)
+                        .scrollIndicators(.never)
                     }
-                    .scrollIndicators(.never)
                 }
 
                 footer
@@ -106,6 +113,147 @@ struct ClipboardGridView: View {
         .padding(.vertical, 17)
     }
 
+    private var filterBar: some View {
+        HStack(spacing: 8) {
+            ForEach(ClipKindFilter.allCases) { kind in
+                Button {
+                    store.selectKind(kind)
+                } label: {
+                    Label(kind.title, systemImage: kind.symbol)
+                        .font(.system(size: 9, weight: .bold, design: .rounded))
+                        .padding(.horizontal, 9)
+                        .padding(.vertical, 7)
+                        .foregroundStyle(store.filter.kind == kind ? .white : .secondary)
+                        .background(
+                            store.filter.kind == kind ? Color(hex: 0x6C63FF) : .black.opacity(0.045),
+                            in: Capsule()
+                        )
+                }
+                .buttonStyle(.plain)
+            }
+
+            Divider().frame(height: 22).padding(.horizontal, 2)
+
+            Menu {
+                Button {
+                    store.selectSource(nil)
+                } label: {
+                    Label("All apps", systemImage: store.filter.sourceKey == nil ? "checkmark.circle.fill" : "app.dashed")
+                }
+                Divider()
+                ForEach(store.sourceFilterOptions) { option in
+                    Button {
+                        store.selectSource(option.id)
+                    } label: {
+                        HStack {
+                            SourceAppIcon(data: option.iconData, size: 16)
+                            Text(option.name)
+                            if store.filter.sourceKey == option.id {
+                                Image(systemName: "checkmark")
+                            }
+                        }
+                    }
+                }
+            } label: {
+                HStack(spacing: 6) {
+                    SourceAppIcon(data: selectedSourceOption?.iconData, size: 16)
+                    Text(selectedSourceOption?.name ?? "All apps")
+                        .lineLimit(1)
+                    Image(systemName: "chevron.down")
+                        .font(.system(size: 8, weight: .bold))
+                }
+                .font(.system(size: 10, weight: .bold, design: .rounded))
+                .padding(.horizontal, 10)
+                .padding(.vertical, 7)
+                .background(.white, in: Capsule())
+                .overlay(Capsule().stroke(.black.opacity(0.09)))
+            }
+            .menuStyle(.borderlessButton)
+            .fixedSize()
+
+            if store.filter.kind == .files, !store.fileExtensionFilterOptions.isEmpty {
+                Menu {
+                    Button("All file types") {
+                        store.selectFileExtension(nil)
+                    }
+                    Divider()
+                    ForEach(store.fileExtensionFilterOptions) { option in
+                        Button {
+                            store.selectFileExtension(option.id)
+                        } label: {
+                            HStack {
+                                Text(option.title)
+                                if store.filter.fileExtension == option.id {
+                                    Image(systemName: "checkmark")
+                                }
+                            }
+                        }
+                    }
+                } label: {
+                    Label(selectedFileExtensionTitle, systemImage: "doc.badge.gearshape")
+                        .font(.system(size: 10, weight: .bold, design: .rounded))
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 7)
+                        .background(.white, in: Capsule())
+                        .overlay(Capsule().stroke(.black.opacity(0.09)))
+                }
+                .menuStyle(.borderlessButton)
+                .fixedSize()
+            }
+
+            Spacer(minLength: 4)
+
+            Text("\(store.filteredItems.count) of \(store.items.count)")
+                .font(.system(size: 9, weight: .bold, design: .monospaced))
+                .foregroundStyle(.secondary)
+
+            if store.filter.isActive {
+                Button {
+                    store.resetFilter()
+                } label: {
+                    Label("Reset", systemImage: "xmark.circle.fill")
+                        .font(.system(size: 9, weight: .bold))
+                }
+                .buttonStyle(.plain)
+                .foregroundStyle(Color(hex: 0x6C63FF))
+            }
+        }
+        .padding(.horizontal, 22)
+        .padding(.vertical, 10)
+        .background(.white.opacity(0.56))
+    }
+
+    private var selectedSourceOption: SourceFilterOption? {
+        guard let key = store.filter.sourceKey else { return nil }
+        return store.sourceFilterOptions.first { $0.id == key }
+    }
+
+    private var selectedFileExtensionTitle: String {
+        guard let value = store.filter.fileExtension else { return "All file types" }
+        return FileExtensionFilterOption(id: value).title
+    }
+
+    private var filteredEmptyState: some View {
+        VStack(spacing: 13) {
+            Spacer()
+            Image(systemName: "line.3.horizontal.decrease.circle")
+                .font(.system(size: 38, weight: .medium))
+                .foregroundStyle(Color(hex: 0x6C63FF))
+            Text("No clips match these filters")
+                .font(.system(size: 19, weight: .bold, design: .rounded))
+            Text("Choose another type or app, or reset the filter bar.")
+                .font(.system(size: 11))
+                .foregroundStyle(.secondary)
+            Button("Reset filters") {
+                store.resetFilter()
+            }
+            .buttonStyle(.borderedProminent)
+            .tint(Color(hex: 0x6C63FF))
+            Spacer()
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+
     private var emptyState: some View {
         VStack(spacing: 16) {
             Spacer()
@@ -146,6 +294,26 @@ struct ClipboardGridView: View {
         .padding(.vertical, 12)
         .background(.white.opacity(0.7))
         .overlay(alignment: .top) { Divider().opacity(0.55) }
+    }
+}
+
+private struct SourceAppIcon: View {
+    let data: Data?
+    let size: CGFloat
+
+    var body: some View {
+        Group {
+            if let data, let image = NSImage(data: data) {
+                Image(nsImage: image)
+                    .resizable()
+                    .scaledToFit()
+            } else {
+                Image(systemName: "app.dashed")
+                    .font(.system(size: size * 0.62, weight: .semibold))
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .frame(width: size, height: size)
     }
 }
 

@@ -54,3 +54,36 @@ import Testing
     #expect(item.sourceBundleIdentifier == nil)
     #expect(item.sourceIconData == nil)
 }
+
+@Test func filtersMatchKindSourceAndFileExtension() {
+    let safariLink = ClipboardItem(
+        kind: .link,
+        text: "https://example.com",
+        colorIndex: 3,
+        sourceAppName: "Safari",
+        sourceBundleIdentifier: "com.apple.Safari"
+    )
+    let telegramText = ClipboardItem(
+        kind: .text,
+        text: "Message",
+        colorIndex: 8,
+        sourceAppName: "Telegram",
+        sourceBundleIdentifier: "ru.keepcoder.Telegram"
+    )
+    let PDFAndFolder = ClipboardItem(
+        kind: .files,
+        text: "Score.pdf\nScores",
+        filePaths: ["/tmp/Score.pdf", "/tmp/Scores"],
+        colorIndex: 3,
+        sourceAppName: "Finder",
+        sourceBundleIdentifier: "com.apple.finder"
+    )
+
+    #expect(ClipboardFilter(kind: .link).matches(safariLink))
+    #expect(!ClipboardFilter(kind: .text).matches(safariLink))
+    #expect(ClipboardFilter(sourceKey: telegramText.sourceKey).matches(telegramText))
+    #expect(!ClipboardFilter(sourceKey: telegramText.sourceKey).matches(safariLink))
+    #expect(ClipboardFilter(kind: .files, fileExtension: "pdf").matches(PDFAndFolder))
+    #expect(ClipboardFilter(kind: .files, fileExtension: ClipboardItem.noFileExtensionKey).matches(PDFAndFolder))
+    #expect(!ClipboardFilter(kind: .files, fileExtension: "png").matches(PDFAndFolder))
+}
