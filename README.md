@@ -100,15 +100,6 @@ Clipboard contents can be sensitive, so ClipGrid follows a deliberately narrow m
 
 See the [privacy policy](Marketing/Privacy.md), [support guide](Marketing/Support.md), and [security policy](SECURITY.md).
 
-App Store preparation materials are versioned with the source:
-
-- [App Store metadata](Marketing/AppStoreMetadata.md)
-- [App Review notes](Marketing/AppReviewNotes.md)
-- [Privacy and release audit](Marketing/PrivacyAudit.md)
-- [Pricing recommendation](Marketing/Pricing.md)
-- [Version 1.0 changelog](CHANGELOG.md)
-- [Release-readiness checklist](RELEASE.md)
-
 ## Requirements
 
 - macOS 14 Sonoma or later
@@ -134,28 +125,7 @@ The packaging script:
 5. Applies the App Sandbox entitlement and Hardened Runtime
 6. Signs ad hoc by default and verifies the resulting bundle
 
-Set `CLIPGRID_CODESIGN_IDENTITY` to a local signing identity when needed. Mac App Store distribution still requires an Xcode archive target signed with Rudolf's Apple Developer team; the local script does not upload or submit builds.
-
-## Regenerate repository screenshots
-
-```bash
-./scripts/capture_screenshots.sh
-```
-
-Screenshot mode uses fictional in-memory clipboard content, disables panel animation, positions the window consistently, and waits eight seconds for gradients, icons, and image previews to finish rendering. It never reads or overwrites the user's clipboard history. Override the delay with `CLIPGRID_SCREENSHOT_DELAY` when needed.
-
-## Regenerate App Store screenshots
-
-The checked-in App Store assets are composed from the privacy-safe demo captures at Apple's accepted `2880 × 1800` Mac screenshot size:
-
-```bash
-python3 -m venv .venv-marketing
-.venv-marketing/bin/pip install -r Marketing/requirements.txt
-.venv-marketing/bin/python scripts/generate_app_store_screenshots.py
-.venv-marketing/bin/python -m unittest discover -s Tests/MarketingTests -v
-```
-
-Generated files are written to `docs/app-store/`. The CI workflow exercises the complete generator in a temporary directory and verifies that all four outputs use Apple's accepted `2880 × 1800` dimensions. Font rendering may differ slightly between macOS and Linux, so CI validates output rather than requiring byte-identical PNGs across platforms.
+Set `CLIPGRID_CODESIGN_IDENTITY` to a local signing identity when needed. Mac App Store distribution requires an appropriately configured Xcode archive and Apple Developer signing; the local script does not upload or submit builds.
 
 ## Architecture
 
@@ -192,20 +162,9 @@ Tests currently cover:
 - Stable source application color mapping
 - Migration of history written before source metadata existed
 
-## Roadmap
-
-- [ ] Sandboxed Xcode project and App Store archive workflow
-- [ ] Launch at login
-- [x] Filtering by content type, file extension, and source app
-- [x] Pin important clips
-- [ ] User-configurable history length
-- [ ] Optional automatic expiration
-- [ ] App exclusions
-- [ ] App Store screenshots and localization
-
 ## Status
 
-ClipGrid is functional and installed as a local development release. Mac App Store preparation is the next milestone.
+ClipGrid is functional and available for public testing from source.
 
 ## Copyright
 

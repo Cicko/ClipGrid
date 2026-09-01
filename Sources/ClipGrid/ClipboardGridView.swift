@@ -86,9 +86,9 @@ struct ClipboardGridView: View {
 
             HStack(spacing: 7) {
                 Circle()
-                    .fill(store.isPresentingDemoData ? Color(hex: 0x6C63FF) : store.isPaused ? Color.orange : Color.green)
+                    .fill(store.isPaused ? Color.orange : Color.green)
                     .frame(width: 7, height: 7)
-                Text(store.isPresentingDemoData ? "PRIVACY-SAFE DEMO" : store.isPaused ? "MONITORING PAUSED" : "MONITORING CLIPBOARD")
+                Text(store.isPaused ? "MONITORING PAUSED" : "MONITORING CLIPBOARD")
                     .font(.system(size: 9, weight: .bold, design: .monospaced))
                     .foregroundStyle(.secondary)
             }
