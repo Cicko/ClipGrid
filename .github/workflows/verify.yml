@@ -14,5 +14,22 @@ jobs:
         run: swift --version
       - name: Run tests
         run: swift test
-      - name: Build release binary
-        run: swift build -c release
+      - name: Validate release metadata
+        run: |
+          plutil -lint Support/Info.plist
+          plutil -lint Support/ClipGrid.entitlements
+          plutil -lint Support/PrivacyInfo.xcprivacy
+      - name: Build sandboxed release app
+        run: ./scripts/build-app.sh
+      - name: Verify signature and sandbox entitlement
+        run: |
+          codesign --verify --deep --strict dist/ClipGrid.app
+          codesign -d --entitlements :- dist/ClipGrid.app > /tmp/clipgrid-entitlements.plist
+          /usr/libexec/PlistBuddy -c 'Print :com.apple.security.app-sandbox' /tmp/clipgrid-entitlements.plist | grep -qx true
+      - name: Verify App Store screenshot generator
+        run: |
+          python3 -m venv /tmp/clipgrid-marketing-venv
+          /tmp/clipgrid-marketing-venv/bin/pip install -r Marketing/requirements.txt
+          /tmp/clipgrid-marketing-venv/bin/python -m unittest discover -s Tests/MarketingTests -v
+          /tmp/clipgrid-marketing-venv/bin/python scripts/generate_app_store_screenshots.py --output-dir /tmp/clipgrid-app-store
+          /tmp/clipgrid-marketing-venv/bin/python -c "from pathlib import Path; from PIL import Image; files=sorted(Path('/tmp/clipgrid-app-store').glob('*.png')); assert len(files) == 4; assert all(Image.open(path).size == (2880, 1800) for path in files)"

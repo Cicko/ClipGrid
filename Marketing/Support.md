@@ -1,5 +1,10 @@
 # Support
 
+- **Project:** https://github.com/Cicko/ClipGrid
+- **Issue tracker:** https://github.com/Cicko/ClipGrid/issues
+- **Privacy policy:** https://github.com/Cicko/ClipGrid/blob/main/Marketing/Privacy.md
+- **Security reports:** https://github.com/Cicko/ClipGrid/blob/main/SECURITY.md
+
 ## Before opening an issue
 
 1. Confirm ClipGrid is running and its grid icon is visible in the macOS menu bar.
