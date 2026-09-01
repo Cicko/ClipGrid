@@ -268,7 +268,6 @@ final class ClipboardStore: ObservableObject {
     }
 
     private func persist() {
-        guard !isDemoMode else { return }
         guard let data = try? JSONEncoder().encode(items) else { return }
         try? FileManager.default.createDirectory(
             at: historyURL.deletingLastPathComponent(),
