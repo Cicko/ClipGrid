@@ -87,3 +87,25 @@ import Testing
     #expect(ClipboardFilter(kind: .files, fileExtension: ClipboardItem.noFileExtensionKey).matches(PDFAndFolder))
     #expect(!ClipboardFilter(kind: .files, fileExtension: "png").matches(PDFAndFolder))
 }
+
+@Test @MainActor func demoDataIsRepresentativeAndFilterable() {
+    let items = DemoData.makeItems()
+    #expect(items.count == 10)
+    #expect(items.allSatisfy { $0.sourceAppName != nil })
+    #expect(items.contains { $0.kind == .image })
+    #expect(items.contains { $0.kind == .files && $0.fileExtensionKeys.contains("pdf") })
+
+    let safariLinks = items.filter(
+        ClipboardFilter(kind: .link, sourceKey: "com.apple.Safari").matches
+    )
+    #expect(safariLinks.count == 2)
+
+    let finderPDFs = items.filter(
+        ClipboardFilter(
+            kind: .files,
+            sourceKey: "com.apple.finder",
+            fileExtension: "pdf"
+        ).matches
+    )
+    #expect(finderPDFs.count == 1)
+}

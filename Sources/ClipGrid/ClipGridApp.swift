@@ -23,7 +23,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)
 
-        store = ClipboardStore()
+        let arguments = ProcessInfo.processInfo.arguments
+        let demoMode = arguments.contains("--demo")
+        store = ClipboardStore(demoMode: demoMode)
+        if demoMode {
+            applyDemoFilters(from: arguments)
+        }
         panelController = ClipboardPanelController(store: store)
         hotKeyManager = HotKeyManager { [weak self] in
             self?.togglePanel()
@@ -72,6 +77,26 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             panelController.hide()
         } else {
             panelController.show()
+        }
+    }
+
+    private func applyDemoFilters(from arguments: [String]) {
+        if let value = argumentValue(named: "--demo-kind", in: arguments),
+           let kind = ClipKindFilter(rawValue: value) {
+            store.selectKind(kind)
+        }
+        if let source = argumentValue(named: "--demo-source", in: arguments) {
+            store.selectSource(source)
+        }
+        if let fileExtension = argumentValue(named: "--demo-extension", in: arguments) {
+            store.selectFileExtension(fileExtension)
+        }
+    }
+
+    private func argumentValue(named name: String, in arguments: [String]) -> String? {
+        let prefix = "\(name)="
+        return arguments.first(where: { $0.hasPrefix(prefix) }).map {
+            String($0.dropFirst(prefix.count))
         }
     }
 

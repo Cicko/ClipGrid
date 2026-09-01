@@ -52,6 +52,14 @@ struct SourceApplication {
     }
 
     @MainActor
+    static func iconData(forBundleIdentifier bundleIdentifier: String) -> Data? {
+        guard let applicationURL = NSWorkspace.shared.urlForApplication(
+            withBundleIdentifier: bundleIdentifier
+        ) else { return nil }
+        return iconPNGData(NSWorkspace.shared.icon(forFile: applicationURL.path))
+    }
+
+    @MainActor
     private static func iconPNGData(_ image: NSImage) -> Data? {
         let pixelSize = 64
         guard let bitmap = NSBitmapImageRep(

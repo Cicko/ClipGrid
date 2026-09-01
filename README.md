@@ -18,6 +18,20 @@
 
 Clipboard history should be immediate, visually understandable, and private. ClipGrid turns recent copied values into a colorful grid where every card has a stable keyboard shortcut. There is no account, cloud service, analytics SDK, or background network connection.
 
+## Screenshots
+
+### Colorful keyboard-addressable history
+
+![ClipGrid clipboard overview with application icons and colorful cards](docs/screenshots/01-overview.png)
+
+### Filter by content type and source application
+
+![ClipGrid filtered to links copied from Safari](docs/screenshots/02-safari-links-filter.png)
+
+### Filter copied files by application and extension
+
+![ClipGrid filtered to PDF files copied in Finder](docs/screenshots/03-finder-pdf-filter.png)
+
 ## Features
 
 - **Native global shortcut** — press `⌥⌘C` from any application

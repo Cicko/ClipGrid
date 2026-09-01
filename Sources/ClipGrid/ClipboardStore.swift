@@ -12,12 +12,19 @@ final class ClipboardStore: ObservableObject {
     private var lastChangeCount: Int
     private var monitorTask: Task<Void, Never>?
     private let historyURL: URL
+    private let isDemoMode: Bool
 
-    init() {
+    init(demoMode: Bool = false) {
+        isDemoMode = demoMode
         lastChangeCount = pasteboard.changeCount
         historyURL = Self.makeHistoryURL()
-        load()
-        startMonitoring()
+        if demoMode {
+            items = DemoData.makeItems()
+            isPaused = true
+        } else {
+            load()
+            startMonitoring()
+        }
     }
 
     func togglePaused() {
@@ -27,6 +34,8 @@ final class ClipboardStore: ObservableObject {
     var filteredItems: [ClipboardItem] {
         items.filter(filter.matches)
     }
+
+    var isPresentingDemoData: Bool { isDemoMode }
 
     var sourceFilterOptions: [SourceFilterOption] {
         var options: [String: SourceFilterOption] = [:]
@@ -238,6 +247,7 @@ final class ClipboardStore: ObservableObject {
     }
 
     private func persist() {
+        guard !isDemoMode else { return }
         guard let data = try? JSONEncoder().encode(items) else { return }
         try? FileManager.default.createDirectory(
             at: historyURL.deletingLastPathComponent(),
