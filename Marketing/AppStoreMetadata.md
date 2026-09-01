@@ -43,7 +43,7 @@ A CLEAR VIEW OF YOUR HISTORY
 
 • Browse text, links, images, files, and folders
 • Filter by content type or source application
-• Filter copied files by extension
+• Show file clips containing a selected extension while keeping each copied group intact
 • Pin important clips above normal history
 • Remove one item or clear the complete history
 • Pause clipboard monitoring whenever you want
@@ -66,7 +66,7 @@ ClipGrid 1.0 introduces fast, keyboard-addressable clipboard history for macOS:
 
 • Global ⌥⌘C shortcut
 • Text, link, image, file, and folder history
-• Filters by type, source app, and file extension
+• Filters by type and source app, plus file clips narrowed by contained extension
 • Persistent pinned clips
 • Local-only history with pause, delete, and clear controls
 • Concealed and transient pasteboard protection
@@ -102,7 +102,7 @@ The source imports CryptoKit only to create deterministic local clipboard finger
 
 1. **Your clipboard, one shortcut away** — complete grid overview.
 2. **Find the right link instantly** — links filtered to Safari.
-3. **Filter files by app and type** — Finder PDF filter.
+3. **Narrow file clips by app and type** — Finder entries containing PDFs; copied groups stay intact.
 4. **See copied images at a glance** — image previews.
 
 Generated App Store assets belong in `docs/app-store/` at `2880 × 1800`, using fictional demo content only.

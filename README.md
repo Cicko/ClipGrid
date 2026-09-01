@@ -32,7 +32,7 @@ Clipboard history should be immediate, visually understandable, and private. Cli
 
 ![ClipGrid filtered to links copied from Safari](docs/screenshots/02-safari-links-filter.png)
 
-### Filter copied files by application and extension
+### Narrow file clips by application and contained extension
 
 ![ClipGrid filtered to PDF files copied in Finder](docs/screenshots/03-finder-pdf-filter.png)
 
@@ -45,7 +45,7 @@ Clipboard history should be immediate, visually understandable, and private. Cli
 - **Source application identity** — displays the originating app name and native icon on a best-effort basis
 - **App-aware color families** — browsers, Telegram, messaging, notes, developer tools, and other apps receive consistent visual treatment
 - **Instant filters** — narrow history by text, link, image, file, or originating application
-- **Dynamic file types** — when viewing files, filter by extensions such as PDF, PNG, ZIP, or folders without an extension
+- **Dynamic file types** — narrow file clipboard entries to groups containing PDF, PNG, ZIP, or folders without an extension; the copied group stays intact
 - **Persistent pins** — keep important clips above normal history and view them with a dedicated Pinned filter
 - **URL presentation** — copied links show their host and complete URL
 - **Automatic deduplication** — repeated values move to the front

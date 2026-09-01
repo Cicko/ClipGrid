@@ -26,8 +26,8 @@ SCREENSHOTS = (
     (
         "docs/screenshots/03-finder-pdf-filter.png",
         "docs/app-store/03-file-filter.png",
-        "Filter files by app and type",
-        "Narrow copied files by application and extension.",
+        "Narrow file clips by app and type",
+        "Find entries containing PDFs while keeping each copied file group intact.",
     ),
     (
         "docs/screenshots/04-images-filter.png",
