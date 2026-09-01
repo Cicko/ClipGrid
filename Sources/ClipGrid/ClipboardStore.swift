@@ -7,7 +7,7 @@ final class ClipboardStore: ObservableObject {
     @Published private(set) var isPaused = false
 
     private let pasteboard = NSPasteboard.general
-    private let maximumItemCount = 60
+    private let maximumItemCount = ShortcutMap.labels.count
     private var lastChangeCount: Int
     private var monitorTask: Task<Void, Never>?
     private let historyURL: URL
