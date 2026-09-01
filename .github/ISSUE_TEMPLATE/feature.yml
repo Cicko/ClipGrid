@@ -1,0 +1,23 @@
+name: Feature request
+description: Suggest an improvement to ClipGrid
+title: "feat: "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or workflow
+      description: What are you trying to accomplish?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+    validations:
+      required: true
+  - type: textarea
+    id: privacy
+    attributes:
+      label: Privacy or permission implications
+      description: Does this require network access, automation, accessibility, or reading additional application context?
