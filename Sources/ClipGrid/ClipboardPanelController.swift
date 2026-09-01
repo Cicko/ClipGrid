@@ -30,7 +30,7 @@ final class ClipboardPanelController: NSWindowController, NSWindowDelegate {
         panel.backgroundColor = .clear
         panel.isOpaque = false
         panel.hasShadow = true
-        panel.animationBehavior = .utilityWindow
+        panel.animationBehavior = store.isPresentingDemoData ? .none : .utilityWindow
         panel.standardWindowButton(.miniaturizeButton)?.isHidden = true
         panel.standardWindowButton(.zoomButton)?.isHidden = true
         panel.standardWindowButton(.closeButton)?.isHidden = true

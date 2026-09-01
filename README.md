@@ -24,6 +24,10 @@ Clipboard history should be immediate, visually understandable, and private. Cli
 
 ![ClipGrid clipboard overview with application icons and colorful cards](docs/screenshots/01-overview.png)
 
+### Image clipboard previews
+
+![ClipGrid filtered to copied images with colorful visual previews](docs/screenshots/04-images-filter.png)
+
 ### Filter by content type and source application
 
 ![ClipGrid filtered to links copied from Safari](docs/screenshots/02-safari-links-filter.png)
@@ -120,6 +124,14 @@ The packaging script:
 4. Applies an ad-hoc local signature
 
 For Mac App Store distribution, the project will also provide a sandboxed Xcode archive target signed with an Apple Developer team.
+
+## Regenerate repository screenshots
+
+```bash
+./scripts/capture_screenshots.sh
+```
+
+Screenshot mode uses fictional in-memory clipboard content, disables panel animation, positions the window consistently, and waits eight seconds for gradients, icons, and image previews to finish rendering. It never reads or overwrites the user's clipboard history. Override the delay with `CLIPGRID_SCREENSHOT_DELAY` when needed.
 
 ## Architecture
 

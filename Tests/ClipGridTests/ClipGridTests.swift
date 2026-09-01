@@ -92,11 +92,12 @@ import Testing
 
 @Test @MainActor func demoDataIsRepresentativeAndFilterable() {
     let items = DemoData.makeItems()
-    #expect(items.count == 10)
+    #expect(items.count == 11)
     #expect(items.allSatisfy { $0.sourceAppName != nil })
     #expect(items.contains { $0.kind == .image })
     #expect(items.contains { $0.kind == .files && $0.fileExtensionKeys.contains("pdf") })
-    #expect(items.filter(\.isPinned).count == 2)
+    #expect(items.filter(\.isPinned).count == 3)
+    #expect(items.filter { $0.kind == .image }.count == 2)
 
     let safariLinks = items.filter(
         ClipboardFilter(kind: .link, sourceKey: "com.apple.Safari").matches
@@ -115,7 +116,7 @@ import Testing
 
 @Test @MainActor func pinningReordersAndFiltersDemoHistory() throws {
     let store = ClipboardStore(demoMode: true)
-    #expect(store.items.prefix(2).allSatisfy { $0.isPinned })
+    #expect(store.items.prefix(3).allSatisfy { $0.isPinned })
 
     let itemToPin = try #require(store.items.last(where: { !$0.isPinned }))
     store.togglePinned(itemToPin)
@@ -123,10 +124,10 @@ import Testing
     #expect(store.items.first?.isPinned == true)
 
     store.togglePinnedOnly()
-    #expect(store.filteredItems.count == 3)
+    #expect(store.filteredItems.count == 4)
     #expect(store.filteredItems.allSatisfy { $0.isPinned })
 
     store.togglePinned(itemToPin)
-    #expect(store.filteredItems.count == 2)
-    #expect(store.items.firstIndex(where: { !$0.isPinned }) == 2)
+    #expect(store.filteredItems.count == 3)
+    #expect(store.items.firstIndex(where: { !$0.isPinned }) == 3)
 }

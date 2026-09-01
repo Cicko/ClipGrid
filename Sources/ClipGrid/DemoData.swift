@@ -16,6 +16,16 @@ enum DemoData {
                 now: now
             ),
             item(
+                kind: .image,
+                text: "Image · 640 × 360",
+                imageData: makePreviewImage(style: 0),
+                appName: "Photos",
+                bundleIdentifier: "com.apple.Photos",
+                isPinned: true,
+                secondsAgo: 42,
+                now: now
+            ),
+            item(
                 kind: .text,
                 text: "Rehearsal moved to 18:30. Bring the Rachmaninoff score 🎹",
                 appName: "Telegram",
@@ -52,7 +62,7 @@ enum DemoData {
             item(
                 kind: .image,
                 text: "Image · 640 × 360",
-                imageData: makePreviewImage(),
+                imageData: makePreviewImage(style: 1),
                 appName: "Preview",
                 bundleIdentifier: "com.apple.Preview",
                 secondsAgo: 420,
@@ -122,7 +132,7 @@ enum DemoData {
         )
     }
 
-    private static func makePreviewImage() -> Data? {
+    private static func makePreviewImage(style: Int) -> Data? {
         let width = 640
         let height = 360
         guard let bitmap = NSBitmapImageRep(
@@ -144,14 +154,35 @@ enum DemoData {
         NSGraphicsContext.current = context
 
         let bounds = NSRect(x: 0, y: 0, width: width, height: height)
-        NSGradient(colors: [
+        let colors: [NSColor] = style == 0 ? [
+            NSColor(calibratedRed: 0.11, green: 0.42, blue: 0.58, alpha: 1),
+            NSColor(calibratedRed: 0.42, green: 0.80, blue: 0.74, alpha: 1),
+        ] : [
             NSColor(calibratedRed: 0.42, green: 0.36, blue: 0.96, alpha: 1),
             NSColor(calibratedRed: 1.0, green: 0.43, blue: 0.57, alpha: 1),
-        ])?.draw(in: bounds, angle: 18)
+        ]
+        NSGradient(colors: colors)?.draw(in: bounds, angle: 18)
 
-        NSColor.white.withAlphaComponent(0.2).setFill()
-        NSBezierPath(ovalIn: NSRect(x: 405, y: 75, width: 185, height: 185)).fill()
-        NSBezierPath(roundedRect: NSRect(x: 55, y: 80, width: 300, height: 200), xRadius: 35, yRadius: 35).fill()
+        if style == 0 {
+            NSColor(calibratedRed: 1.0, green: 0.82, blue: 0.54, alpha: 0.95).setFill()
+            NSBezierPath(ovalIn: NSRect(x: 460, y: 225, width: 82, height: 82)).fill()
+            let mountains = NSBezierPath()
+            mountains.move(to: NSPoint(x: 0, y: 55))
+            mountains.line(to: NSPoint(x: 150, y: 240))
+            mountains.line(to: NSPoint(x: 255, y: 125))
+            mountains.line(to: NSPoint(x: 365, y: 285))
+            mountains.line(to: NSPoint(x: 520, y: 95))
+            mountains.line(to: NSPoint(x: 640, y: 205))
+            mountains.line(to: NSPoint(x: 640, y: 0))
+            mountains.line(to: NSPoint(x: 0, y: 0))
+            mountains.close()
+            NSColor.white.withAlphaComponent(0.72).setFill()
+            mountains.fill()
+        } else {
+            NSColor.white.withAlphaComponent(0.2).setFill()
+            NSBezierPath(ovalIn: NSRect(x: 405, y: 75, width: 185, height: 185)).fill()
+            NSBezierPath(roundedRect: NSRect(x: 55, y: 80, width: 300, height: 200), xRadius: 35, yRadius: 35).fill()
+        }
         context.flushGraphics()
         return bitmap.representation(using: .png, properties: [:])
     }
