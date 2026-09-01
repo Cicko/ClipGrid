@@ -19,7 +19,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 - Global `⌥⌘C` shortcut using the native macOS hotkey API.
 - Keyboard-addressable clipboard history using `1–9`, then `A–Z`.
 - Support for text, HTTP/HTTPS links, images, files, and folders.
-- Filters by content type, source application, and file extension.
+- Filters by content type and source application, with file clips narrowed by contained extension.
 - Best-effort source-application name, icon, and color attribution.
 - Persistent pinned clips.
 - Per-item deletion, complete-history clearing, and monitoring pause control.
