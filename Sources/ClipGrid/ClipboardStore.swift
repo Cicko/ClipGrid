@@ -55,7 +55,7 @@ final class ClipboardStore: ObservableObject {
     private func startMonitoring() {
         monitorTask = Task { [weak self] in
             while !Task.isCancelled {
-                try? await Task.sleep(for: .milliseconds(350))
+                try? await Task.sleep(for: .milliseconds(150))
                 guard let self, !self.isPaused else { continue }
                 self.capturePasteboardIfChanged()
             }
@@ -87,7 +87,8 @@ final class ClipboardStore: ObservableObject {
         let currentTypes = Set((pasteboard.types ?? []).map(\.rawValue))
         guard currentTypes.isDisjoint(with: protectedTypes) else { return nil }
 
-        let colorIndex = items.count % 10
+        let sourceApplication = SourceApplication.captureFrontmost()
+        let colorIndex = sourceApplication?.colorIndex ?? items.count % 10
 
         if let URLs = pasteboard.readObjects(
             forClasses: [NSURL.self],
@@ -99,7 +100,10 @@ final class ClipboardStore: ObservableObject {
                 kind: .files,
                 text: names,
                 filePaths: paths,
-                colorIndex: colorIndex
+                colorIndex: colorIndex,
+                sourceAppName: sourceApplication?.name,
+                sourceBundleIdentifier: sourceApplication?.bundleIdentifier,
+                sourceIconData: sourceApplication?.iconData
             )
         }
 
@@ -113,11 +117,14 @@ final class ClipboardStore: ObservableObject {
                 kind: .image,
                 text: description,
                 imageData: imageData,
-                colorIndex: colorIndex
+                colorIndex: colorIndex,
+                sourceAppName: sourceApplication?.name,
+                sourceBundleIdentifier: sourceApplication?.bundleIdentifier,
+                sourceIconData: sourceApplication?.iconData
             )
         }
 
-        guard let string = pasteboard.string(forType: .string)?
+        guard let string = (pasteboard.string(forType: .URL) ?? pasteboard.string(forType: .string))?
             .trimmingCharacters(in: .whitespacesAndNewlines),
               !string.isEmpty else { return nil }
 
@@ -128,7 +135,14 @@ final class ClipboardStore: ObservableObject {
             kind = .text
         }
 
-        return ClipboardItem(kind: kind, text: string, colorIndex: colorIndex)
+        return ClipboardItem(
+            kind: kind,
+            text: string,
+            colorIndex: colorIndex,
+            sourceAppName: sourceApplication?.name,
+            sourceBundleIdentifier: sourceApplication?.bundleIdentifier,
+            sourceIconData: sourceApplication?.iconData
+        )
     }
 
     private func pngData(from pasteboard: NSPasteboard) -> Data? {

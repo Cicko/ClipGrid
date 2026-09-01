@@ -34,6 +34,9 @@ struct ClipboardItem: Identifiable, Codable, Equatable, Sendable {
     let filePaths: [String]
     let copiedAt: Date
     let colorIndex: Int
+    let sourceAppName: String?
+    let sourceBundleIdentifier: String?
+    let sourceIconData: Data?
 
     init(
         id: UUID = UUID(),
@@ -42,7 +45,10 @@ struct ClipboardItem: Identifiable, Codable, Equatable, Sendable {
         imageData: Data? = nil,
         filePaths: [String] = [],
         copiedAt: Date = Date(),
-        colorIndex: Int
+        colorIndex: Int,
+        sourceAppName: String? = nil,
+        sourceBundleIdentifier: String? = nil,
+        sourceIconData: Data? = nil
     ) {
         self.id = id
         self.kind = kind
@@ -51,6 +57,9 @@ struct ClipboardItem: Identifiable, Codable, Equatable, Sendable {
         self.filePaths = filePaths
         self.copiedAt = copiedAt
         self.colorIndex = colorIndex
+        self.sourceAppName = sourceAppName
+        self.sourceBundleIdentifier = sourceBundleIdentifier
+        self.sourceIconData = sourceIconData
     }
 
     var fingerprint: String {

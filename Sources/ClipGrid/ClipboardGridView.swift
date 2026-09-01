@@ -176,9 +176,7 @@ private struct ClipboardCard: View {
                         .background(.white.opacity(0.82), in: RoundedRectangle(cornerRadius: 8))
                         .overlay(RoundedRectangle(cornerRadius: 8).stroke(.white))
 
-                    Label(item.kind.label, systemImage: item.kind.symbol)
-                        .font(.system(size: 9, weight: .bold, design: .monospaced))
-                        .foregroundStyle(palette.ink.opacity(0.72))
+                    sourceBadge
 
                     Spacer()
                     Color.clear.frame(width: 25, height: 25)
@@ -259,6 +257,32 @@ private struct ClipboardCard: View {
                 .lineLimit(6)
                 .lineSpacing(2)
         }
+    }
+
+    private var sourceBadge: some View {
+        HStack(spacing: 6) {
+            if let data = item.sourceIconData, let icon = NSImage(data: data) {
+                Image(nsImage: icon)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 20, height: 20)
+            } else {
+                Image(systemName: item.kind.symbol)
+                    .font(.system(size: 11, weight: .bold))
+                    .frame(width: 20, height: 20)
+                    .background(.white.opacity(0.52), in: RoundedRectangle(cornerRadius: 5))
+            }
+
+            VStack(alignment: .leading, spacing: 0) {
+                Text(item.sourceAppName ?? "Copied value")
+                    .font(.system(size: 9, weight: .bold, design: .rounded))
+                    .lineLimit(1)
+                Text(item.kind.label)
+                    .font(.system(size: 7, weight: .bold, design: .monospaced))
+                    .opacity(0.58)
+            }
+        }
+        .foregroundStyle(palette.ink.opacity(0.78))
     }
 
     private var relativeDate: String {
